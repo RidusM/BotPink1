@@ -113,6 +113,7 @@ async def st_update(message: types.Message, state:FSMContext):
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
 async def text_handler_forupp(message: types.Message):
+    reader.tasks_reader()
     await bot.send_message(message.from_user.id, "Выберите одно из двух действий:", reply_markup=keyboard.replykb4)
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
@@ -135,11 +136,10 @@ async def send_doc(message: types.Message):
         </tr>
     </tbody></table></body></html>''')
 
-    Html_file = open('index.html', 'w')
+    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
     Html_file.write(html_str)
     Html_file.close()
     Html_file2 = open('index.html', 'rb')
-    reader.tasks_reader()
     await bot.send_document(message.from_user.id, Html_file2)
 
 if __name__ == '__main__':
