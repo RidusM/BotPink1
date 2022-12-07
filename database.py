@@ -47,9 +47,9 @@ def db_table_selectAll():
 
 def select_id_from_projects():
     cursor.execute("SELECT id FROM Projects")
-    article = [*cursor.fetchone()]
+    article = cursor.fetchone()
     out = []
     while article is not None:
         out.append("%s" % article)
-        row = cursor.fetchone()
-    return ''.join(out)
+        article = cursor.fetchone()
+    return ' '.join(out)

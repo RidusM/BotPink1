@@ -143,4 +143,4 @@ async def send_doc(message: types.Message):
     await bot.send_document(message.from_user.id, Html_file2)
 
 if __name__ == '__main__':
-    executor.start_polling(dp)
+    executor.start_polling(dp, skip_updates=True)
