@@ -44,3 +44,12 @@ def db_table_selectAll():
         out.append("""\n        <td><228></td><td><228></td><td align="center">%s</td>\n<td><228></td>\n<td><228></td></tr>""" % row[2])
         row = cursor.fetchone()
     return ''.join(out)
+
+def select_id_from_projects():
+    cursor.execute("SELECT id FROM Projects")
+    article = [*cursor.fetchone()]
+    out = []
+    while article is not None:
+        out.append("%s" % article)
+        row = cursor.fetchone()
+    return ''.join(out)
