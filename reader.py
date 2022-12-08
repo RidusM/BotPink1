@@ -46,6 +46,7 @@ def tasks_reader():
                     this_dat = datetime.datetime.now()
                     this_week = this_dat.isocalendar()[1]
                     for resp in curid:
+                        print(curid)
                         if item['model_id'] == resp and pn_st_dt == this_week:
                             project_sum_task += 1
                             if item['time_estimate'] > 0:
