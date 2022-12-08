@@ -134,7 +134,7 @@ async def send_doc(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {reader.tasks_reader2()}
+        {reader.tasks_reader2(this_week)}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week}</h2>
@@ -149,7 +149,7 @@ async def send_doc(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {reader.task_reader3()}
+    {reader.task_reader3(this_week)}
     </tbody></table>
     </body></html>''')
 
@@ -176,7 +176,7 @@ async def send_doc_next_week(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {reader.tasks_reader2()}
+        {reader.tasks_reader2(this_week+1)}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week+1}</h2>
@@ -191,7 +191,7 @@ async def send_doc_next_week(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {reader.task_reader3()}
+    {reader.task_reader3(this_week+1)}
     </tbody></table>
     </body></html>''')
 

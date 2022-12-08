@@ -35,7 +35,7 @@ def tasks_reader():
         entries += data['response']['items']
     return entries
 
-def tasks_reader2():
+def tasks_reader2(need_week: int):
     entries = tasks_reader()
     curid = db.select_id_from_projects()
     nameproj = []
@@ -52,9 +52,7 @@ def tasks_reader2():
                 pn_st_dt = item['plan_start_date']
                 pn_st_dt = dattime.strptime(pn_st_dt, '%Y-%m-%d %H:%M:%S')
                 pn_st_dt = pn_st_dt.isocalendar()[1]
-                this_dat = datetime.datetime.now()
-                this_week = this_dat.isocalendar()[1]
-                if item['model_id'] == resp[0] and pn_st_dt == this_week:
+                if item['model_id'] == resp[0] and pn_st_dt == need_week:
                     project_sum_task += 1
                     if item['time_estimate'] > 0:
                         project_sum_time += item['time_estimate']
@@ -68,7 +66,8 @@ def tasks_reader2():
         numberinmass += 1
         modeif.append(f"""<tr><td>{numberinmass}</td><td>{nameproj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{costproj}</td></tr>""")
     return ''.join(modeif)
-def task_reader3():
+
+def task_reader3(need_week: int):
     entries = tasks_reader()
     curid = db.select_id_from_projects()
     idstaff = db.select_id_from_staff()
@@ -87,9 +86,7 @@ def task_reader3():
                     pn_st_dt = item['plan_start_date']
                     pn_st_dt = dattime.strptime(pn_st_dt, '%Y-%m-%d %H:%M:%S')
                     pn_st_dt = pn_st_dt.isocalendar()[1]
-                    this_dat = datetime.datetime.now()
-                    this_week = this_dat.isocalendar()[1]
-                    if item['responsible_id'] == resp2[0] and pn_st_dt == this_week and item['model_id'] == resp[0]:
+                    if item['responsible_id'] == resp2[0] and pn_st_dt == need_week and item['model_id'] == resp[0]:
                         project_sum_task += 1
                         nameproj = db.select_proj_name_from_projects_byid(item['model_id'])
                         namestaff = db.select_name_from_staff_byid(item['responsible_id'])
