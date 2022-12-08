@@ -19,12 +19,13 @@ button_get_othect = KeyboardButton('Получить отчет')
 
 button_now = KeyboardButton('Текущая неделя')
 button_future = KeyboardButton('Следующая неделя')
+button_fullback = KeyboardButton('К начальному окну')
 button_back = KeyboardButton('Назад')
 
 replykb=ReplyKeyboardMarkup(resize_keyboard=True).add(button_planning, button_marketing)
-replykb2=ReplyKeyboardMarkup(resize_keyboard=True).add(button_updates, button_price_projcost, button_get_othect, button_back)
-replykb3=ReplyKeyboardMarkup(resize_keyboard=True).add(button_set_cost, button_staff_cost, button_back)
-replykb4=ReplyKeyboardMarkup(resize_keyboard=True).add(button_now, button_future, button_back)
+replykb2=ReplyKeyboardMarkup(resize_keyboard=True).add(button_updates, button_price_projcost, button_get_othect, button_fullback)
+replykb3=ReplyKeyboardMarkup(resize_keyboard=True).add(button_set_cost, button_staff_cost, button_back, button_fullback)
+replykb4=ReplyKeyboardMarkup(resize_keyboard=True).add(button_now, button_future, button_back, button_fullback)
 
 def genmarkup_for_projects(data):
 

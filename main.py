@@ -72,9 +72,13 @@ async def text_handler2(message: types.Message):
     data = cursor.fetchall()
     await bot.send_message(message.from_user.id, "Выберите ставку для сотрудника", reply_markup=keyboard.genmarkup_for_staff(data))
 
+@dp.message_handler(content_types=['text'], text='К начальному окну')
+async def fullback(message: types.Message):
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb)
+
 @dp.message_handler(content_types=['text'], text='Назад')
 async def back(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb)
+    await bot.send_message(message.from_user.id, "Выберите действие:", reply_markup=keyboard.replykb2)
 
 @dp.callback_query_handler(lambda call: True, state=UpdateOfPayment.choosing_id_of_employee)
 async def staffcostcallback(callback_query: types.CallbackQuery, state: FSMContext):
@@ -113,8 +117,6 @@ async def st_update(message: types.Message, state:FSMContext):
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
 async def text_handler_forupp(message: types.Message):
-    reader.tasks_reader2()
-    reader.task_reader3()
     await bot.send_message(message.from_user.id, "Выберите одно из двух действий:", reply_markup=keyboard.replykb4)
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
