@@ -47,8 +47,21 @@ def db_table_selectAll():
 
 def select_id_from_projects():
     cursor.execute("SELECT id FROM Projects")
-    article = [*cursor.fetchall()]
-    for row in article:
-        article = [*cursor.fetchone()]
-    return article
+    backkk = [*cursor.fetchall()]
+    return backkk
+
+def select_proj_name_from_projects_byid(id: int):
+    cursor.execute("SELECT project_name FROM Projects WHERE id =?", (id,))
+    backkk = cursor.fetchone()
+    return backkk
+
+def select_name_from_staff_byid(id: int):
+    cursor.execute("SELECT name FROM staff where id = ?", (id,))
+    backkk = cursor.fetchone()
+    return backkk
+
+def select_id_from_staff():
+    cursor.execute("SELECT id FROM staff")
+    backkk = [*cursor.fetchall()]
+    return backkk
 

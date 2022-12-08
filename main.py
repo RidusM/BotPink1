@@ -113,7 +113,8 @@ async def st_update(message: types.Message, state:FSMContext):
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
 async def text_handler_forupp(message: types.Message):
-    reader.tasks_reader()
+    reader.tasks_reader2()
+    reader.task_reader3()
     await bot.send_message(message.from_user.id, "Выберите одно из двух действий:", reply_markup=keyboard.replykb4)
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
