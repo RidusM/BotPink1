@@ -39,6 +39,9 @@ def tasks_reader2():
     entries = tasks_reader()
     curid = db.select_id_from_projects()
     nameproj = []
+    costproj = []
+    modeif = []
+    numberinmass = 0
     for resp in curid:
         project_sum_time = 0
         project_sum_task = 0
@@ -56,17 +59,23 @@ def tasks_reader2():
                     if item['time_estimate'] > 0:
                         project_sum_time += item['time_estimate']
         nameproj=db.select_proj_name_from_projects_byid(resp[0])
+        costproj=db.select_proj_cost_from_projects_byid(resp[0])
         print(resp[0])
         print(nameproj)
         print(f'sum task: {project_sum_task}')
         project_sum_time = (project_sum_time % (168 * 3600)) / 3600
         print(f'sum time: {project_sum_time}')
+        numberinmass += 1
+        modeif.append(f"""<tr><td>{numberinmass}</td><td>{nameproj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{costproj}</td></tr>""")
+    return ''.join(modeif)
 def task_reader3():
     entries = tasks_reader()
     curid = db.select_id_from_projects()
     idstaff = db.select_id_from_staff()
     namestaff = []
     nameproj = []
+    modeif = []
+    numberinmass = 0
     for resp in curid:
         for resp2 in idstaff:
             project_sum_time = 0
@@ -92,3 +101,7 @@ def task_reader3():
                 print(f'sum task: {project_sum_task}')
                 project_sum_time = (project_sum_time % (168 * 3600)) / 3600
                 print(f'sum time: {project_sum_time}')
+                numberinmass += 1
+                modeif.append(
+                    f"""<tr><td>{numberinmass}</td><td>{namestaff}</td><td>{nameproj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{40*200}</td></tr>""")
+    return ''.join(modeif)

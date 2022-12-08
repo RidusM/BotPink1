@@ -119,9 +119,11 @@ async def text_handler_forupp(message: types.Message):
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
 async def send_doc(message: types.Message):
+    this_dat = datetime.datetime.now()
+    this_week = this_dat.isocalendar()[1]
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
-    <h2>Неделя 49</h2>
+    <h2>Неделя {this_week}</h2>
     <table border="1">
         <tbody><tr>
             <td>#</td>
@@ -132,10 +134,66 @@ async def send_doc(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        <tr>
-            <td>{db.db_table_selectAll()}</td>
+        {reader.tasks_reader2()}
+    </tbody></table>
+    <h1>Распределение нагрузки на специалистов</h1>
+<h2>Неделя {this_week}</h2>
+<table border=1>
+    <tr>
+        <td>#</td>
+        <td>Специалист</td>
+        <td>Кол-во проектов</td>
+        <td>Кол-во задач</td>
+        <td>Плановая нагрузка, ч</td>
+        <td>Себестоимость недели</td>
+        <td>Плановая стоимость специалиста</td>
+        <td>Доля нагрузки специалиста</td>
+    </tr>
+    {reader.task_reader3()}
+    </tbody></table>
+    </body></html>''')
+
+    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
+    Html_file.write(html_str)
+    Html_file.close()
+    Html_file2 = open('index.html', 'rb')
+    await bot.send_document(message.from_user.id, Html_file2)
+
+@dp.message_handler(content_types=['text'], text='Следующая неделя')
+async def send_doc_next_week(message: types.Message):
+    this_dat = datetime.datetime.now()
+    this_week = this_dat.isocalendar()[1]
+    html_str = (f'''<!DOCTYPE html>
+        <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
+    <h2>Неделя {this_week+1}</h2>
+    <table border="1">
+        <tbody><tr>
+            <td>#</td>
+            <td>Проект</td>
+            <td>Кол-во задач</td>
+            <td>Плановая нагрузка, ч</td>
+            <td>Плановая стоимость недели</td>
+            <td>Себестоимость недели</td>
+            <td>Доля загрузки проекта</td>
         </tr>
-    </tbody></table></body></html>''')
+        {reader.tasks_reader2()}
+    </tbody></table>
+    <h1>Распределение нагрузки на специалистов</h1>
+<h2>Неделя {this_week+1}</h2>
+<table border=1>
+    <tr>
+        <td>#</td>
+        <td>Специалист</td>
+        <td>Кол-во проектов</td>
+        <td>Кол-во задач</td>
+        <td>Плановая нагрузка, ч</td>
+        <td>Себестоимость недели</td>
+        <td>Плановая стоимость специалиста</td>
+        <td>Доля нагрузки специалиста</td>
+    </tr>
+    {reader.task_reader3()}
+    </tbody></table>
+    </body></html>''')
 
     Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
     Html_file.write(html_str)

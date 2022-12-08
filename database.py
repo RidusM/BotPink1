@@ -53,12 +53,20 @@ def select_id_from_projects():
 def select_proj_name_from_projects_byid(id: int):
     cursor.execute("SELECT project_name FROM Projects WHERE id =?", (id,))
     backkk = cursor.fetchone()
-    return backkk
+    back2 = [backkk[0] for item in backkk]
+    return str(back2).replace("['",'').replace("']",'')
+
+def select_proj_cost_from_projects_byid(id: int):
+    cursor.execute("SELECT cost FROM Projects WHERE id =?", (id,))
+    backkk = cursor.fetchone()
+    back2 = [backkk[0] for item in backkk]
+    return str(back2).replace('[','').replace(']','')
 
 def select_name_from_staff_byid(id: int):
     cursor.execute("SELECT name FROM staff where id = ?", (id,))
     backkk = cursor.fetchone()
-    return backkk
+    back2 = [backkk[0] for item in backkk]
+    return str(back2).replace("['",'').replace("']",'')
 
 def select_id_from_staff():
     cursor.execute("SELECT id FROM staff")
