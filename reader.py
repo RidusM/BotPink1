@@ -38,10 +38,10 @@ def tasks_reader():
 def tasks_reader2():
     entries = tasks_reader()
     curid = db.select_id_from_projects()
+    nameproj = []
     for resp in curid:
         project_sum_time = 0
         project_sum_task = 0
-        print(f'id proj: {resp[0]}')
         for item in entries:
             if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] == None:
                 item['plan_start_date'] = None
@@ -53,9 +53,11 @@ def tasks_reader2():
                 this_week = this_dat.isocalendar()[1]
                 if item['model_id'] == resp[0] and pn_st_dt == this_week:
                     project_sum_task += 1
-                    if item['time_estimate'] > 0 and item:
+                    if item['time_estimate'] > 0:
                         project_sum_time += item['time_estimate']
-
+        nameproj=db.select_proj_name_from_projects_byid(resp[0])
+        print(resp[0])
+        print(nameproj)
         print(f'sum task: {project_sum_task}')
         project_sum_time = (project_sum_time % (168 * 3600)) / 3600
         print(f'sum time: {project_sum_time}')
@@ -63,7 +65,6 @@ def task_reader3():
     entries = tasks_reader()
     curid = db.select_id_from_projects()
     idstaff = db.select_id_from_staff()
-    print(idstaff)
     namestaff = []
     nameproj = []
     for resp in curid:
@@ -81,11 +82,13 @@ def task_reader3():
                     this_week = this_dat.isocalendar()[1]
                     if item['responsible_id'] == resp2[0] and pn_st_dt == this_week and item['model_id'] == resp[0]:
                         project_sum_task += 1
+                        nameproj = db.select_proj_name_from_projects_byid(item['model_id'])
                         namestaff = db.select_name_from_staff_byid(item['responsible_id'])
                         if item['time_estimate'] > 0 and item:
                             project_sum_time += item['time_estimate']
-            print()
-            print(namestaff)
-            print(f'sum task: {project_sum_task}')
-            project_sum_time = (project_sum_time % (168 * 3600)) / 3600
-            print(f'sum time: {project_sum_time}')
+            if project_sum_task != 0:
+                print(nameproj)
+                print(namestaff)
+                print(f'sum task: {project_sum_task}')
+                project_sum_time = (project_sum_time % (168 * 3600)) / 3600
+                print(f'sum time: {project_sum_time}')
