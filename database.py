@@ -73,3 +73,10 @@ def select_id_from_staff():
     backkk = [*cursor.fetchall()]
     return backkk
 
+def select_cost_from_staff_byid(id: int):
+    cursor.execute("SELECT hour_cost FROM staff where id = ?", (id,))
+    backkk = cursor.fetchone()
+    back2 = [backkk[0] for item in backkk]
+    back2 = list(map(int, back2))
+    return str(back2).replace('[','').replace(']','')
+

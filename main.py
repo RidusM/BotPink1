@@ -197,7 +197,7 @@ async def send_doc_next_week(message: types.Message):
     </tbody></table>
     </body></html>''')
 
-    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
+    Html_file = open('index.html', 'w', encoding='windows 1251', errors='ignore')
     Html_file.write(html_str)
     Html_file.close()
     Html_file2 = open('index.html', 'rb')
