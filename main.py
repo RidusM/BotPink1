@@ -78,7 +78,7 @@ async def fullback(message: types.Message):
 
 @dp.message_handler(content_types=['text'], text='Назад')
 async def back(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите действие:", reply_markup=keyboard.replykb2)
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb2)
 
 @dp.callback_query_handler(lambda call: True, state=UpdateOfPayment.choosing_id_of_employee)
 async def staffcostcallback(callback_query: types.CallbackQuery, state: FSMContext):
@@ -197,7 +197,7 @@ async def send_doc_next_week(message: types.Message):
     </tbody></table>
     </body></html>''')
 
-    Html_file = open('index.html', 'w', encoding='windows 1251', errors='ignore')
+    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
     Html_file.write(html_str)
     Html_file.close()
     Html_file2 = open('index.html', 'rb')
