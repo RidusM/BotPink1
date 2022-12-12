@@ -142,9 +142,9 @@ async def text_handler_for_report(message: types.Message):
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
 async def send_report_this_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
-    this_dat = datetime.datetime.now()
-    this_week = this_dat.isocalendar()[1]
-    html_projects, html_staff = reader.tasks_reader2(this_week)
+    this_date = datetime.datetime.now()
+    this_week = this_date.isocalendar()[1]
+    html_projects, html_staff = reader.html_create_table_finall(this_week)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
@@ -187,9 +187,9 @@ async def send_report_this_week(message: types.Message):
 @dp.message_handler(content_types=['text'], text='Следующая неделя')
 async def send_report_next_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
-    this_dat = datetime.datetime.now()
-    this_week = this_dat.isocalendar()[1]
-    html_projects, html_staff = reader.tasks_reader2(this_week+1)
+    this_date = datetime.datetime.now()
+    this_week = this_date.isocalendar()[1]
+    html_projects, html_staff = reader.html_create_table_finall(this_week+1)
     html_str = (f'''
     <!DOCTYPE html>
     <html><head></head><body><h1>Распределение нагрузки на проектам</h1>

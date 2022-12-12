@@ -35,7 +35,7 @@ def get_task_list():
     return entries_data
 
 
-def html_staff_create_table(need_week: int):
+def html_create_table_step_1(need_week: int):
     entries_data = get_task_list()
     selected_id_of_projects = db.select_id_from_projects()
     selected_id_of_staff = db.select_id_from_staff()
@@ -116,13 +116,13 @@ def html_staff_create_table(need_week: int):
     return ''.join(table_staff_list), project_summary_time_dict
 
 
-def tasks_reader2(need_week: int):
+def html_create_table_finall(need_week: int):
     entries_data = get_task_list()
     selected_id_of_projects = db.select_id_from_projects()
     table_projects = []
     table_staff = []
     number_in_table = 0
-    html_projects, html_cost_proj = html_staff_create_table(need_week)
+    html_projects, html_cost_proj = html_create_table_step_1(need_week)
     for resp in selected_id_of_projects:
         project_sum_time = 0
         project_sum_task = 0
