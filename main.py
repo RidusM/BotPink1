@@ -123,6 +123,7 @@ async def text_handler_forupp(message: types.Message):
 async def send_doc(message: types.Message):
     this_dat = datetime.datetime.now()
     this_week = this_dat.isocalendar()[1]
+    appendhtml, appendhtml2 = reader.task_reader3(this_week)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
@@ -151,7 +152,7 @@ async def send_doc(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {reader.task_reader3(this_week)}
+    {appendhtml}
     </tbody></table>
     </body></html>''')
 
