@@ -46,7 +46,7 @@ def select_projects_id():
     return selected_data_list
 
 
-def select_project_name_by_id(id: int):
+def select_project_name_byid(id: int):
     cursor.execute("SELECT project_name FROM Projects WHERE id =?", (id,))
     select_data = cursor.fetchone()
     selected_data_list = [select_data[0] for _ in select_data]
