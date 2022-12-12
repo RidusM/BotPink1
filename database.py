@@ -4,7 +4,7 @@ conn = sqlite3.connect('BotDataBase.db')
 cursor = conn.cursor()
 def table_create_projects(id: int, project_name: str):
     try:
-        cursor.execute("INSERT INTO Projects(id, project_name) VALUES (?,?)", (id, project_name))
+        cursor.execute("INSERT INTO Projects(id, project_name, cost) VALUES (?,?, 1)", (id, project_name))
         conn.commit()
     except sqlite3.Error as Er:
         print("Ошибка1")

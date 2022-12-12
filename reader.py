@@ -1,5 +1,8 @@
+import collections
+import functools
 import json
 import datetime
+import operator
 import time
 from datetime import datetime as dattime
 
@@ -69,6 +72,7 @@ def task_reader3(need_week: int):
     idstaff = db.select_id_from_staff()
     namestaff = []
     projsumtime = {}
+    projsumtime2 = []
     who2 = 0
     what2 = 0
     plan_coststaff = 0
@@ -77,6 +81,7 @@ def task_reader3(need_week: int):
     project_sum_proj = 0
     for resp2 in idstaff:
         project_sum_time = 0
+        cur_proj_sum_time = 0
         project_sum_task = 0
         for resp in curid:
             for item in entries:
@@ -96,6 +101,7 @@ def task_reader3(need_week: int):
                         namestaff = db.select_name_from_staff_byid(item['responsible_id'])
                         if item['time_estimate'] > 0:
                             project_sum_time += item['time_estimate']
+                            cur_proj_sum_time += item['time_estimate']
                 if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] == None:
                     item['plan_start_date'] = None
                 else:
@@ -106,19 +112,25 @@ def task_reader3(need_week: int):
                         who = resp[0]
                         who2 += round(what2/who)
                         what2=0
-                        print(who)
-                        print(project_sum_time)
-                        projsumtime[who]=project_sum_time
+                        projsumtime[who] = 0
+                        if item['time_estimate'] > 0:
+                            projsumtime[who]+=round(((cur_proj_sum_time % (168 * 3600)) / 3600)*fact_coststaff)
             if who2 == 1:
                 project_sum_proj += 1
             if who2 > 1:
                 project_sum_proj += 1
             who2=0
+            cur_proj_sum_time = 0
         if project_sum_task != 0:
+            projsumtime2.append(projsumtime.copy())
             print(projsumtime)
             project_sum_time = (project_sum_time % (168 * 3600)) / 3600
             numberinmass += 1
             modeif.append(
                 f"""<tr><td>{numberinmass}</td><td>{namestaff}</td><td>{project_sum_proj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{fact_coststaff*(round(project_sum_time))}</td><td>{plan_coststaff}</td><td>{round(((fact_coststaff*(round(project_sum_time)))/plan_coststaff)*100)}%</td></tr>""")
         project_sum_proj = 0
+        projsumtime.clear()
+    projsumtime = projsumtime2
+    projsumtime = functools.reduce(operator.add, map(collections.Counter, projsumtime))
+    print(projsumtime)
     return ''.join(modeif)

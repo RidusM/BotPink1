@@ -95,7 +95,7 @@ async def stafcost_update(message: types.Message, state: FSMContext):
         data["costofproject"] = message.text
     db.table_update_staff_cost(data["costofproject"], data["idofemployee"])
     await state.finish()
-    await bot.send_message(message.from_user.id, "Возвращаю вас к начальному окну", reply_markup=keyboard.replykb2)
+    await bot.send_message(message.from_user.id, "Выберте дальнейшее действие", reply_markup=keyboard.replykb3)
 
 @dp.callback_query_handler(lambda call: True, state=UpdateProjects.choosing_id_of_project)
 async def stoptopupcall(callback_query: types.CallbackQuery, state: FSMContext):
@@ -113,7 +113,7 @@ async def st_update(message: types.Message, state:FSMContext):
         data["costofproject"] = message.text
     db.table_update_projects_cost(data["costofproject"], data["idofproject"])
     await state.finish()
-    await bot.send_message(message.from_user.id, "Возвращаю вас к начальному окну", reply_markup=keyboard.replykb2)
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb3)
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
 async def text_handler_forupp(message: types.Message):
