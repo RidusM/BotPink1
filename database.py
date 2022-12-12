@@ -12,7 +12,7 @@ def table_create_projects(id: int, project_name: str):
 
 def table_create_staff(id: int, name: str):
     try:
-        cursor.execute("INSERT INTO staff(id, name) VALUES (?,?)", (id, name))
+        cursor.execute("INSERT INTO staff(id, name, hour_cost) VALUES (?,?, 1)", (id, name))
         conn.commit()
     except sqlite3.Error as Er:
         print("Ошибка2")

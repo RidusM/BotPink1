@@ -1,9 +1,6 @@
 import collections
 import functools
-import json
-import datetime
 import operator
-import time
 from datetime import datetime as dattime
 
 import requests
@@ -95,25 +92,33 @@ def task_reader3(need_week: int):
             cur_proj_sum_time = 0
         if project_sum_task != 0:
             projsumtime2.append(projsumtime.copy())
-            print(projsumtime)
             project_sum_time = (project_sum_time % (168 * 3600)) / 3600
             numberinmass += 1
             modeif.append(
-                f"""<tr><td>{numberinmass}</td><td>{namestaff}</td><td>{project_sum_proj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{fact_coststaff*(round(project_sum_time))}</td><td>{plan_coststaff}</td><td>{round(((fact_coststaff*(round(project_sum_time)))/plan_coststaff)*100)}%</td></tr>""")
+                f"""
+                <tr>
+                <td>{numberinmass}</td>
+                <td>{namestaff}</td>
+                <td>{project_sum_proj}</td>
+                <td>{project_sum_task}</td>
+                <td>{round(project_sum_time)}</td>
+                <td>{fact_coststaff*(round(project_sum_time))}</td>
+                <td>{plan_coststaff}</td>
+                <td>{round(((fact_coststaff*(round(project_sum_time)))/plan_coststaff)*100)}%</td>
+                </tr>""")
         project_sum_proj = 0
         projsumtime.clear()
     projsumtime = projsumtime2
     projsumtime = functools.reduce(operator.add, map(collections.Counter, projsumtime))
-    print(projsumtime)
-    return modeif, projsumtime
+    return ''.join(modeif), projsumtime
 
 def tasks_reader2(need_week: int):
     entries = tasks_reader()
     curid = db.select_id_from_projects()
-    nameproj = []
-    costproj = []
     modeif = []
+    modeif2 = []
     numberinmass = 0
+    apphtml1, apphtml2 = task_reader3(need_week)
     for resp in curid:
         project_sum_time = 0
         project_sum_task = 0
@@ -128,9 +133,20 @@ def tasks_reader2(need_week: int):
                     project_sum_task += 1
                     if item['time_estimate'] > 0:
                         project_sum_time += item['time_estimate']
+        plancost = apphtml2[resp[0]]
         nameproj=db.select_proj_name_from_projects_byid(resp[0])
         costproj=db.select_proj_cost_from_projects_byid(resp[0])
         project_sum_time = (project_sum_time % (168 * 3600)) / 3600
         numberinmass += 1
-        modeif.append(f"""<tr><td>{numberinmass}</td><td>{nameproj}</td><td>{project_sum_task}</td><td>{round(project_sum_time)}</td><td>{costproj}</td><td>{22}</td><td>{costproj}</td></tr>""")
-    return ''.join(modeif)
+        nagruz = plancost/int(costproj)
+        modeif.append(f"""<tr>
+        <td>{numberinmass}</td>
+        <td>{nameproj}</td>
+        <td>{project_sum_task}</td>
+        <td>{round(project_sum_time)}</td>
+        <td>{costproj}</td>
+        <td>{plancost}</td>
+        <td>{round(nagruz*100)}%</td>
+        </tr>""")
+    modeif2.append(apphtml1)
+    return ''.join(modeif), ''.join(modeif2)

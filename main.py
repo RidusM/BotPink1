@@ -1,8 +1,4 @@
 import datetime
-import json
-from typing import Collection
-import datetime
-import requests as requests
 from aiogram import Bot, types, Dispatcher, executor
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,9 +6,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 import logging
 import sqlite3
 
-from aiogram.types import CallbackQuery, InlineKeyboardButton, callback_query
-
-import database
 import database as db
 import reader
 
@@ -121,9 +114,10 @@ async def text_handler_forupp(message: types.Message):
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
 async def send_doc(message: types.Message):
+    await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_dat = datetime.datetime.now()
     this_week = this_dat.isocalendar()[1]
-    appendhtml, appendhtml2 = reader.task_reader3(this_week)
+    apphtml1, apphtml2 = reader.tasks_reader2(this_week)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
@@ -137,7 +131,7 @@ async def send_doc(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {reader.tasks_reader2(this_week)}
+        {apphtml1}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week}</h2>
@@ -152,7 +146,7 @@ async def send_doc(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {appendhtml}
+    {apphtml2}
     </tbody></table>
     </body></html>''')
 
@@ -164,8 +158,10 @@ async def send_doc(message: types.Message):
 
 @dp.message_handler(content_types=['text'], text='Следующая неделя')
 async def send_doc_next_week(message: types.Message):
+    await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_dat = datetime.datetime.now()
     this_week = this_dat.isocalendar()[1]
+    apphtml1, apphtml2 = reader.tasks_reader2(this_week+1)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week+1}</h2>
@@ -179,7 +175,7 @@ async def send_doc_next_week(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {reader.tasks_reader2(this_week+1)}
+        {apphtml1}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week+1}</h2>
@@ -194,7 +190,7 @@ async def send_doc_next_week(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {reader.task_reader3(this_week+1)}
+    {apphtml2}
     </tbody></table>
     </body></html>''')
 
