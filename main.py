@@ -5,10 +5,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import State, StatesGroup
 import logging
 import sqlite3
-
 import database as db
 import reader
-
 import keyboard
 from config import Token
 
@@ -33,27 +31,27 @@ dp = Dispatcher(bot, storage=storage)
 
 
 @dp.message_handler(commands=['start'])
-async def start(message: types.Message):
+async def start_menu(message: types.Message):
     await bot.send_message(message.from_user.id, "Привет, я бот Пинк для получения информаци"
                                                  "\bВыберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_start)
 
 
 @dp.message_handler(content_types=['text'], text='Рекламные продукты')
-async def marketing(message: types.Message):
+async def marketing_menu(message: types.Message):
     await bot.send_message(message.from_user.id, 'К сожалению функционал этой кнопки еще не работает',
                            reply_markup=keyboard.reply_keyboard_start)
 
 
 @dp.message_handler(content_types=['text'], text='Планирование')
-async def planning(message: types.Message):
+async def planning_menu(message: types.Message):
     await bot.send_message(message.from_user.id, "Выберите действие:", reply_markup=keyboard.reply_keyboard_planning)
 
 
 @dp.message_handler(content_types=['text'], text='Обновить данные')
 async def update_info(message: types.Message):
-    reader.get_list_project()
-    reader.get_list_staff()
+    reader.get_projects()
+    reader.get_staff()
     await bot.send_message(message.from_user.id, "Обновил данные")
 
 
@@ -64,31 +62,31 @@ async def choice_of_edit(message: types.Message):
 
 
 @dp.message_handler(content_types=['text'], text='Указать цену по проекту')
-async def edit_cost_proj(message: types.Message):
+async def edit_project_cost(message: types.Message):
     await UpdateProjects.choosing_id_of_project.set()
     cursor.execute("SELECT * FROM Projects")
     data = cursor.fetchall()
     await bot.send_message(message.from_user.id, "Выберите проект из списка:",
-                           reply_markup=keyboard.gen_inline_for_projects(data))
+                           reply_markup=keyboard.gen_inline_projects(data))
 
 
 @dp.message_handler(content_types=['text'], text='Указать ставку по сотруднику')
-async def edit_cost_staff(message: types.Message):
+async def edit_staff_cost(message: types.Message):
     await UpdateOfPayment.choosing_id_of_employee.set()
     cursor.execute("SELECT * FROM staff")
     data = cursor.fetchall()
     await bot.send_message(message.from_user.id, "Выберите ставку для сотрудника",
-                           reply_markup=keyboard.gen_inline_for_staff(data))
+                           reply_markup=keyboard.gen_inline_staff(data))
 
 
 @dp.message_handler(content_types=['text'], text='К начальному окну')
-async def fullback(message: types.Message):
+async def fullback_button(message: types.Message):
     await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_start)
 
 
 @dp.message_handler(content_types=['text'], text='Назад')
-async def back(message: types.Message):
+async def back_button(message: types.Message):
     await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_planning)
 
@@ -107,7 +105,7 @@ async def staff_cost_callback(callback_query: types.CallbackQuery, state: FSMCon
 async def staff_cost_update(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["costofproject"] = message.text
-    db.table_update_staff_cost(data["costofproject"], data["idofemployee"])
+    db.update_staff_cost(data["costofproject"], data["idofemployee"])
     await state.finish()
     await bot.send_message(message.from_user.id, "Выберте дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_set_params)
@@ -127,24 +125,24 @@ async def project_cost_callback(callback_query: types.CallbackQuery, state: FSMC
 async def project_cost_update(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["costofproject"] = message.text
-    db.table_update_projects_cost(data["costofproject"], data["idofproject"])
+    db.update_projects_cost(data["costofproject"], data["idofproject"])
     await state.finish()
     await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_set_params)
 
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
-async def text_handler_for_report(message: types.Message):
+async def report_menu(message: types.Message):
     await bot.send_message(message.from_user.id, "Выберите одно из двух действий:",
                            reply_markup=keyboard.reply_keyboard_get_report)
 
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
-async def send_report_this_week(message: types.Message):
+async def get_report_this_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_date = datetime.datetime.now()
     this_week = this_date.isocalendar()[1]
-    html_projects, html_staff = reader.html_create_table_finall(this_week)
+    html_projects, html_staff = reader.html_get_projects(this_week)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
@@ -185,11 +183,11 @@ async def send_report_this_week(message: types.Message):
 
 
 @dp.message_handler(content_types=['text'], text='Следующая неделя')
-async def send_report_next_week(message: types.Message):
+async def get_report_next_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_date = datetime.datetime.now()
     this_week = this_date.isocalendar()[1]
-    html_projects, html_staff = reader.html_create_table_finall(this_week+1)
+    html_projects, html_staff = reader.html_get_projects(this_week + 1)
     html_str = (f'''
     <!DOCTYPE html>
     <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
