@@ -136,19 +136,19 @@ def html_get_projects(need_week: int):
                     project_tasks += 1
                     if item['time_estimate'] > 0:
                         project_time += item['time_estimate']
-        plan_cost = html_project_cost[projects_id[0]]
+        fact_cost = html_project_cost[projects_id[0]]
         project_name = db.select_project_name_byid(projects_id[0])
-        project_cost = db.select_project_cost_byid(projects_id[0])
+        plan_cost = db.select_project_cost_byid(projects_id[0])
         project_time = (project_time % (168 * 3600)) / 3600
         enumerate_project += 1
-        work_load = plan_cost / int(project_cost)
+        work_load = fact_cost / int(plan_cost)
         projects.append(f"""<tr>
         <td>{enumerate_project}</td>
         <td>{project_name}</td>
         <td>{project_tasks}</td>
         <td>{round(project_time)}</td>
-        <td>{project_cost}</td>
         <td>{plan_cost}</td>
+        <td>{fact_cost}</td>
         <td>{round(work_load * 100)}%</td>
         </tr>""")
     staff.append(html_projects)
