@@ -12,13 +12,16 @@ import reader
 import keyboard
 from config import Token
 
+
 class UpdateProjects(StatesGroup):
     choosing_id_of_project = State()
     choosing_cost_of_project = State()
 
+
 class UpdateOfPayment(StatesGroup):
     choosing_id_of_employee = State()
     choosing_cost_of_employee = State()
+
 
 conn = sqlite3.connect('BotDataBase.db')
 cursor = conn.cursor()
@@ -28,53 +31,70 @@ bot = Bot(token=Token)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     await bot.send_message(message.from_user.id, "Привет, я бот Пинк для получения информаци"
-                                                 "\bВыберите дальнейшее действие", reply_markup=keyboard.replykb)
+                                                 "\bВыберите дальнейшее действие",
+                           reply_markup=keyboard.reply_keyboard_start)
+
 
 @dp.message_handler(content_types=['text'], text='Рекламные продукты')
 async def marketing(message: types.Message):
-    await bot.send_message(message.from_user.id, 'К сожалению функционал этой кнопки еще не работает', reply_markup=keyboard.replykb)
+    await bot.send_message(message.from_user.id, 'К сожалению функционал этой кнопки еще не работает',
+                           reply_markup=keyboard.reply_keyboard_start)
+
 
 @dp.message_handler(content_types=['text'], text='Планирование')
-async def text_handler_for_update(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите действие:", reply_markup=keyboard.replykb2)
+async def planning(message: types.Message):
+    await bot.send_message(message.from_user.id, "Выберите действие:", reply_markup=keyboard.reply_keyboard_planning)
+
 
 @dp.message_handler(content_types=['text'], text='Обновить данные')
-async def text_handler_forupp(message: types.Message):
-    reader.project_reader()
-    reader.staff_reader()
+async def update_info(message: types.Message):
+    reader.get_list_project()
+    reader.get_list_staff()
     await bot.send_message(message.from_user.id, "Обновил данные")
 
+
 @dp.message_handler(content_types=['text'], text='Редактировать проекты/сотрудников')
-async def handler_for_update(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите, что хотите отредактировать?", reply_markup=keyboard.replykb3)
+async def choice_of_edit(message: types.Message):
+    await bot.send_message(message.from_user.id, "Выберите, что хотите отредактировать?",
+                           reply_markup=keyboard.reply_keyboard_set_params)
+
 
 @dp.message_handler(content_types=['text'], text='Указать цену по проекту')
-async def text_handler(message: types.Message):
+async def edit_cost_proj(message: types.Message):
     await UpdateProjects.choosing_id_of_project.set()
     cursor.execute("SELECT * FROM Projects")
     data = cursor.fetchall()
-    await bot.send_message(message.from_user.id, "Выберите проект из списка:", reply_markup=keyboard.genmarkup_for_projects(data))
+    await bot.send_message(message.from_user.id, "Выберите проект из списка:",
+                           reply_markup=keyboard.gen_inline_for_projects(data))
+
 
 @dp.message_handler(content_types=['text'], text='Указать ставку по сотруднику')
-async def text_handler2(message: types.Message):
+async def edit_cost_staff(message: types.Message):
     await UpdateOfPayment.choosing_id_of_employee.set()
     cursor.execute("SELECT * FROM staff")
     data = cursor.fetchall()
-    await bot.send_message(message.from_user.id, "Выберите ставку для сотрудника", reply_markup=keyboard.genmarkup_for_staff(data))
+    await bot.send_message(message.from_user.id, "Выберите ставку для сотрудника",
+                           reply_markup=keyboard.gen_inline_for_staff(data))
+
 
 @dp.message_handler(content_types=['text'], text='К начальному окну')
 async def fullback(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb)
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
+                           reply_markup=keyboard.reply_keyboard_start)
+
 
 @dp.message_handler(content_types=['text'], text='Назад')
 async def back(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb2)
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
+                           reply_markup=keyboard.reply_keyboard_planning)
+
 
 @dp.callback_query_handler(lambda call: True, state=UpdateOfPayment.choosing_id_of_employee)
-async def staffcostcallback(callback_query: types.CallbackQuery, state: FSMContext):
+async def staff_cost_callback(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_text(f'Введите новую ставку р/ч')
     async with state.proxy() as data:
@@ -82,16 +102,19 @@ async def staffcostcallback(callback_query: types.CallbackQuery, state: FSMConte
     await UpdateOfPayment.choosing_cost_of_employee.set()
     await callback_query.answer()
 
+
 @dp.message_handler(state=UpdateOfPayment.choosing_cost_of_employee)
-async def stafcost_update(message: types.Message, state: FSMContext):
+async def staff_cost_update(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["costofproject"] = message.text
     db.table_update_staff_cost(data["costofproject"], data["idofemployee"])
     await state.finish()
-    await bot.send_message(message.from_user.id, "Выберте дальнейшее действие", reply_markup=keyboard.replykb3)
+    await bot.send_message(message.from_user.id, "Выберте дальнейшее действие",
+                           reply_markup=keyboard.reply_keyboard_set_params)
+
 
 @dp.callback_query_handler(lambda call: True, state=UpdateProjects.choosing_id_of_project)
-async def stoptopupcall(callback_query: types.CallbackQuery, state: FSMContext):
+async def project_cost_callback(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_text(f'Введите значение цены')
     async with state.proxy() as data:
@@ -99,25 +122,29 @@ async def stoptopupcall(callback_query: types.CallbackQuery, state: FSMContext):
     await UpdateProjects.choosing_cost_of_project.set()
     await callback_query.answer()
 
+
 @dp.message_handler(state=UpdateProjects.choosing_cost_of_project)
-async def st_update(message: types.Message, state:FSMContext):
-    cost_of_project = message.from_user.id
+async def project_cost_update(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["costofproject"] = message.text
     db.table_update_projects_cost(data["costofproject"], data["idofproject"])
     await state.finish()
-    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие", reply_markup=keyboard.replykb3)
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
+                           reply_markup=keyboard.reply_keyboard_set_params)
+
 
 @dp.message_handler(content_types=['text'], text='Получить отчет')
-async def text_handler_forupp(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выберите одно из двух действий:", reply_markup=keyboard.replykb4)
+async def text_handler_for_report(message: types.Message):
+    await bot.send_message(message.from_user.id, "Выберите одно из двух действий:",
+                           reply_markup=keyboard.reply_keyboard_get_report)
+
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
-async def send_doc(message: types.Message):
+async def send_report_this_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_dat = datetime.datetime.now()
     this_week = this_dat.isocalendar()[1]
-    apphtml1, apphtml2 = reader.tasks_reader2(this_week)
+    html_projects, html_staff = reader.tasks_reader2(this_week)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
@@ -131,7 +158,7 @@ async def send_doc(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {apphtml1}
+        {html_projects}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week}</h2>
@@ -146,24 +173,26 @@ async def send_doc(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {apphtml2}
+    {html_staff}
     </tbody></table>
     </body></html>''')
 
-    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
-    Html_file.write(html_str)
-    Html_file.close()
-    Html_file2 = open('index.html', 'rb')
-    await bot.send_document(message.from_user.id, Html_file2)
+    html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
+    html_file.write(html_str)
+    html_file.close()
+    html_file2 = open('index.html', 'rb')
+    await bot.send_document(message.from_user.id, html_file2)
+
 
 @dp.message_handler(content_types=['text'], text='Следующая неделя')
-async def send_doc_next_week(message: types.Message):
+async def send_report_next_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_dat = datetime.datetime.now()
     this_week = this_dat.isocalendar()[1]
-    apphtml1, apphtml2 = reader.tasks_reader2(this_week+1)
-    html_str = (f'''<!DOCTYPE html>
-        <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
+    html_projects, html_staff = reader.tasks_reader2(this_week+1)
+    html_str = (f'''
+    <!DOCTYPE html>
+    <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week+1}</h2>
     <table border="1">
         <tbody><tr>
@@ -175,7 +204,7 @@ async def send_doc_next_week(message: types.Message):
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
-        {apphtml1}
+        {html_projects}
     </tbody></table>
     <h1>Распределение нагрузки на специалистов</h1>
 <h2>Неделя {this_week+1}</h2>
@@ -190,15 +219,15 @@ async def send_doc_next_week(message: types.Message):
         <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
-    {apphtml2}
+    {html_staff}
     </tbody></table>
     </body></html>''')
 
-    Html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
-    Html_file.write(html_str)
-    Html_file.close()
-    Html_file2 = open('index.html', 'rb')
-    await bot.send_document(message.from_user.id, Html_file2)
+    html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
+    html_file.write(html_str)
+    html_file.close()
+    html_file2 = open('index.html', 'rb')
+    await bot.send_document(message.from_user.id, html_file2)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
