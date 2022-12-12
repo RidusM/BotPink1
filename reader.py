@@ -54,13 +54,14 @@ def html_staff_create_table(need_week: int):
         project_sum_task = 0
         for id_of_projects in selected_id_of_projects:
             for item in entries_data:
-                if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] == None:
+                if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] is None:
                     item['plan_start_date'] = None
                 else:
                     plan_start_date = item['plan_start_date']
                     plan_start_date = dt.strptime(plan_start_date, '%Y-%m-%d %H:%M:%S')
                     plan_start_date = plan_start_date.isocalendar()[1]
-                    if item['responsible_id'] == id_of_staff[0] and plan_start_date == need_week and item['model_id'] == id_of_projects[0]:
+                    if item['responsible_id'] == id_of_staff[0] and plan_start_date == need_week\
+                            and item['model_id'] == id_of_projects[0]:
                         what = (id_of_projects[0])
                         id_staff_step_2 += what
                         project_sum_task += 1
@@ -71,19 +72,21 @@ def html_staff_create_table(need_week: int):
                         if item['time_estimate'] > 0:
                             project_sum_time += item['time_estimate']
                             cur_proj_sum_time += item['time_estimate']
-                if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] == None:
+                if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] is None:
                     item['plan_start_date'] = None
                 else:
                     plan_start_date = item['plan_start_date']
                     plan_start_date = dt.strptime(plan_start_date, '%Y-%m-%d %H:%M:%S')
                     plan_start_date = plan_start_date.isocalendar()[1]
-                    if project_sum_task >= 1 and item['responsible_id'] == id_of_staff[0] and plan_start_date == need_week and item['model_id'] == id_of_projects[0]:
+                    if project_sum_task >= 1 and item['responsible_id'] == id_of_staff[0]\
+                            and plan_start_date == need_week and item['model_id'] == id_of_projects[0]:
                         id_staff_step_1 = id_of_projects[0]
                         id_project_step_2 += round(id_staff_step_2/id_staff_step_1)
-                        id_staff_step_2=0
+                        id_staff_step_2 = 0
                         project_summary_time_dict[id_staff_step_1] = 0
                         if item['time_estimate'] > 0:
-                            project_summary_time_dict[id_staff_step_1] += round(((cur_proj_sum_time % (168 * 3600)) / 3600)*fact_cost_staff)
+                            project_summary_time_dict[id_staff_step_1] += round(((cur_proj_sum_time % (168 * 3600))
+                                                                                 / 3600)*fact_cost_staff)
             if id_project_step_2 == 1:
                 project_sum_proj += 1
             if id_project_step_2 > 1:
@@ -119,12 +122,12 @@ def tasks_reader2(need_week: int):
     table_projects = []
     table_staff = []
     number_in_table = 0
-    apphtml1, apphtml2 = html_staff_create_table(need_week)
+    html_projects, html_cost_proj = html_staff_create_table(need_week)
     for resp in selected_id_of_projects:
         project_sum_time = 0
         project_sum_task = 0
         for item in entries_data:
-            if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] == None:
+            if item['plan_start_date'] == '0000-00-00 00:00:00' or item['plan_start_date'] is None:
                 item['plan_start_date'] = None
             else:
                 pn_st_dt = item['plan_start_date']
@@ -134,13 +137,12 @@ def tasks_reader2(need_week: int):
                     project_sum_task += 1
                     if item['time_estimate'] > 0:
                         project_sum_time += item['time_estimate']
-        plan_cost = apphtml2[resp[0]]
-        name_of_project=db.select_proj_name_from_projects_byid(resp[0])
-        cost_of_project=db.select_proj_cost_from_projects_byid(resp[0])
-        print(cost_of_project)
+        plan_cost = html_cost_proj[resp[0]]
+        name_of_project = db.select_proj_name_from_projects_byid(resp[0])
+        cost_of_project = db.select_proj_cost_from_projects_byid(resp[0])
         project_sum_time = (project_sum_time % (168 * 3600)) / 3600
         number_in_table += 1
-        nagruzka = plan_cost/int(cost_of_project)
+        work_load = plan_cost/int(cost_of_project)
         table_projects.append(f"""<tr>
         <td>{number_in_table}</td>
         <td>{name_of_project}</td>
@@ -148,7 +150,7 @@ def tasks_reader2(need_week: int):
         <td>{round(project_sum_time)}</td>
         <td>{cost_of_project}</td>
         <td>{plan_cost}</td>
-        <td>{round(nagruzka*100)}%</td>
+        <td>{round(work_load*100)}%</td>
         </tr>""")
-    table_staff.append(apphtml1)
+    table_staff.append(html_projects)
     return ''.join(table_projects), ''.join(table_staff)

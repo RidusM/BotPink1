@@ -57,8 +57,7 @@ def select_proj_cost_from_projects_byid(id: int):
     cursor.execute("SELECT cost FROM Projects WHERE id =?", (id,))
     selected_data_step_1 = cursor.fetchone()
     selected_data_step_2 = [selected_data_step_1[0] for item in selected_data_step_1]
-    selected_data_step_2 = list(map(int, selected_data_step_2))
-    return str(selected_data_step_2).replace("['", '').replace("']", '')
+    return str(selected_data_step_2).replace('[','').replace(']','')
 
 
 def select_name_from_staff_byid(id: int):
