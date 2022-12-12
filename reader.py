@@ -48,7 +48,7 @@ def html_create_table_step_1(need_week: int):
     id_staff_step_2 = 0
     plan_cost_staff = 0
     number_in_table = 0
-    project_sum_proj = 0
+    summary_project = 0
     for id_of_staff in selected_id_of_staff:
         project_sum_time = 0
         cur_proj_sum_time = 0
@@ -89,9 +89,9 @@ def html_create_table_step_1(need_week: int):
                             project_summary_time_dict[id_staff_step_1] += round(((cur_proj_sum_time % (168 * 3600))
                                                                                  / 3600)*fact_cost_staff)
             if id_project_step_2 == 1:
-                project_sum_proj += 1
+                summary_project += 1
             if id_project_step_2 > 1:
-                project_sum_proj += 1
+                summary_project += 1
             id_project_step_2 = 0
             cur_proj_sum_time = 0
         if project_sum_task != 0:
@@ -103,14 +103,14 @@ def html_create_table_step_1(need_week: int):
                 <tr>
                 <td>{number_in_table}</td>
                 <td>{name_staff_list}</td>
-                <td>{project_sum_proj}</td>
+                <td>{summary_project}</td>
                 <td>{project_sum_task}</td>
                 <td>{round(project_sum_time)}</td>
                 <td>{fact_cost_staff*(round(project_sum_time))}</td>
                 <td>{plan_cost_staff}</td>
                 <td>{round(((fact_cost_staff*(round(project_sum_time)))/plan_cost_staff)*100)}%</td>
                 </tr>""")
-        project_sum_proj = 0
+        summary_project = 0
         project_summary_time_dict.clear()
     project_summary_time_dict = project_summary_time_list_of_dict
     project_summary_time_dict = functools.reduce(operator.add, map(collections.Counter, project_summary_time_dict))
