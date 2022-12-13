@@ -10,7 +10,7 @@ button_edit = KeyboardButton('Редактировать проекты/сотр
 
 button_set_cost = KeyboardButton('Указать цену по проекту')
 button_staff_cost = KeyboardButton('Указать ставку по сотруднику')
-button_get_staff_cost = KeyboardButton('Получить ставки отрудников')
+button_get_staff_cost = KeyboardButton('Получить ставки сотрудников')
 
 button_get_report = KeyboardButton('Получить отчет')
 
