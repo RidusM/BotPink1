@@ -67,7 +67,7 @@ async def get_staff_cost(message: types.Message):
     cursor.execute("SELECT name, hour_cost FROM staff")
     select_data = cursor.fetchall()
     for data in select_data:
-        formated_select_data +=(f'\n{data[0]} : {data[1]}')
+        formated_select_data += f'\n{data[0]} : {data[1]}'
     await bot.send_message(message.from_user.id, formated_select_data)
 
 
