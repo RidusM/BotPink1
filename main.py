@@ -61,6 +61,16 @@ async def choice_of_edit(message: types.Message):
                            reply_markup=keyboard.reply_keyboard_set_params)
 
 
+@dp.message_handler(content_types=['text'], text='Получить ставки сотрудников')
+async def get_staff_cost(message: types.Message):
+    formated_select_data = ''
+    cursor.execute("SELECT name, hour_cost FROM staff")
+    select_data = cursor.fetchall()
+    for data in select_data:
+        formated_select_data +=(f'\n{data[0]} : {data[1]}')
+    await bot.send_message(message.from_user.id, formated_select_data)
+
+
 @dp.message_handler(content_types=['text'], text='Указать цену по проекту')
 async def edit_project_cost(message: types.Message):
     await UpdateProjects.choosing_id_of_project.set()

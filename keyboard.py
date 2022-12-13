@@ -10,6 +10,7 @@ button_edit = KeyboardButton('Редактировать проекты/сотр
 
 button_set_cost = KeyboardButton('Указать цену по проекту')
 button_staff_cost = KeyboardButton('Указать ставку по сотруднику')
+button_get_staff_cost = KeyboardButton('Получить ставки отрудников')
 
 button_get_report = KeyboardButton('Получить отчет')
 
@@ -22,6 +23,7 @@ reply_keyboard_start = ReplyKeyboardMarkup(resize_keyboard=True).add(button_plan
 reply_keyboard_planning = ReplyKeyboardMarkup(resize_keyboard=True).add(button_updates, button_edit,
                                                                         button_get_report, button_fullback)
 reply_keyboard_set_params = ReplyKeyboardMarkup(resize_keyboard=True).add(button_set_cost, button_staff_cost,
+                                                                          button_get_staff_cost,
                                                                           button_back, button_fullback)
 reply_keyboard_get_report = ReplyKeyboardMarkup(resize_keyboard=True).add(button_now, button_future,
                                                                           button_back, button_fullback)
