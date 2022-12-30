@@ -156,8 +156,6 @@ async def get_report_this_week(message: types.Message):
     this_date = datetime.datetime.now()
     this_week = this_date.isocalendar()[1]
     html_projects, html_staff = reader.html_get_projects(this_week)
-    print(html_staff)
-    print(html_projects)
     html_str = (f'''<!DOCTYPE html>
         <html><head></head>
         <font color = "#D3D3D3", face="Myriad, Myriad Pro, Arial">
