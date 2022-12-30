@@ -113,11 +113,12 @@ async def staff_cost_callback(callback_query: types.CallbackQuery, state: FSMCon
 
 @dp.message_handler(state=UpdateOfPayment.choosing_cost_of_employee)
 async def staff_cost_update(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data["costofproject"] = message.text
-    db.update_staff_cost(data["costofproject"], data["idofemployee"])
+    if message.text != 'Назад':
+        async with state.proxy() as data:
+            data["costofstaff"] = message.text
+        db.update_staff_cost(data["costofstaff"], data["idofemployee"])
     await state.finish()
-    await bot.send_message(message.from_user.id, "Выберте дальнейшее действие",
+    await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_set_params)
 
 
@@ -133,9 +134,10 @@ async def project_cost_callback(callback_query: types.CallbackQuery, state: FSMC
 
 @dp.message_handler(state=UpdateProjects.choosing_cost_of_project)
 async def project_cost_update(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data["costofproject"] = message.text
-    db.update_projects_cost(data["costofproject"], data["idofproject"])
+    if message.text != "Назад":
+        async with state.proxy() as data:
+            data["costofproject"] = message.text
+        db.update_projects_cost(data["costofproject"], data["idofproject"])
     await state.finish()
     await bot.send_message(message.from_user.id, "Выберите дальнейшее действие",
                            reply_markup=keyboard.reply_keyboard_set_params)
@@ -148,21 +150,23 @@ async def report_menu(message: types.Message):
 
 
 @dp.message_handler(content_types=['text'], text='Текущая неделя')
+@dp.message_handler(commands='current')
 async def get_report_this_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_date = datetime.datetime.now()
     this_week = this_date.isocalendar()[1]
     html_projects, html_staff = reader.html_get_projects(this_week)
+    print(html_staff)
+    print(html_projects)
     html_str = (f'''<!DOCTYPE html>
-        <html><head></head><body><h1>Распределение нагрузки на проектам</h1>
+        <html><head></head>
+        <font color = "#D3D3D3", face="Myriad, Myriad Pro, Arial">
+        <body bgcolor = "#19191a"><h1>Распределение нагрузки на проектам</h1>
     <h2>Неделя {this_week}</h2>
     <table border="1">
         <tbody><tr>
-            <td>#</td>
             <td>Проект</td>
-            <td>Кол-во задач</td>
             <td>Плановая нагрузка, ч</td>
-            <td>Плановая стоимость недели</td>
             <td>Себестоимость недели</td>
             <td>Доля загрузки проекта</td>
         </tr>
@@ -172,17 +176,13 @@ async def get_report_this_week(message: types.Message):
 <h2>Неделя {this_week}</h2>
 <table border=1>
     <tr>
-        <td>#</td>
         <td>Специалист</td>
-        <td>Кол-во проектов</td>
-        <td>Кол-во задач</td>
         <td>Плановая нагрузка, ч</td>
         <td>Себестоимость недели</td>
-        <td>Плановая стоимость специалиста</td>
         <td>Доля нагрузки специалиста</td>
     </tr>
     {html_staff}
-    </tbody></table>
+    </tbody></font></table>
     </body></html>''')
 
     html_file = open('index.html', 'w', encoding='cp1251', errors='ignore')
@@ -193,6 +193,7 @@ async def get_report_this_week(message: types.Message):
 
 
 @dp.message_handler(content_types=['text'], text='Следующая неделя')
+@dp.message_handler(commands=['next'])
 async def get_report_next_week(message: types.Message):
     await bot.send_message(message.from_user.id, "Идет загрузка отчета")
     this_date = datetime.datetime.now()
